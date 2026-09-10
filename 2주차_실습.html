@@ -1,0 +1,318 @@
+<!doctype html>
+<html lang="ko">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>머신러닝 프로젝트 (RISE) 실습 · 2주차 · 프롬프트 기반 개발과 AI 코딩 도구</title>
+<style>
+:root{--navy:#1B2A4A;--ink:#1F2937;--gray:#6B7280;--lgray:#D1D5DB;--soft:#F5F6F8;--white:#fff;--code:#1E2533;--codefg:#E5E7EB;--ok:#0E8C86;--bad:#C0395F;--warn:#D97706;--accent:#4F5BD5;--tint:#E9EBF9}
+*{box-sizing:border-box}
+html{scroll-behavior:smooth}
+body{margin:0;font-family:"Malgun Gothic","맑은 고딕","Apple SD Gothic Neo","Noto Sans KR",system-ui,sans-serif;color:var(--ink);background:#EEF0F4;line-height:1.55}
+header{background:var(--navy);color:#fff;padding:28px 0 22px;border-top:6px solid var(--accent)}
+.wrap{max-width:1040px;margin:0 auto;padding:0 20px}
+.chip{display:inline-block;font-size:11px;font-weight:700;padding:3px 10px;border-radius:999px;background:var(--accent);color:#fff;letter-spacing:.3px}
+.chip.soft{background:var(--tint);color:var(--accent)}
+header h1{margin:10px 0 4px;font-size:28px}
+header .sub{color:#C5CEDD;font-size:14px}
+.topbar{position:sticky;top:0;z-index:20;background:#fff;border-bottom:1px solid var(--lgray);box-shadow:0 1px 4px rgba(0,0,0,.05)}
+.topbar .wrap{display:flex;align-items:center;gap:14px;padding:8px 20px;flex-wrap:wrap}
+.prog{flex:1;min-width:180px;height:10px;background:var(--soft);border-radius:999px;overflow:hidden;border:1px solid var(--lgray)}
+.prog > i{display:block;height:100%;width:0;background:var(--accent);transition:width .3s}
+.score{font-size:13px;color:var(--gray);white-space:nowrap}
+.score b{color:var(--ink)}
+nav.parts{display:flex;gap:6px;flex-wrap:wrap}
+nav.parts a{font-size:12px;padding:3px 9px;border-radius:999px;border:1px solid var(--lgray);color:var(--gray);text-decoration:none;background:#fff}
+nav.parts a:hover{border-color:var(--accent);color:var(--accent)}
+.btn{font:inherit;font-size:13px;font-weight:700;padding:7px 14px;border-radius:8px;border:1px solid var(--lgray);background:#fff;color:var(--ink);cursor:pointer}
+.btn.primary{background:var(--accent);border-color:var(--accent);color:#fff}
+.btn.ghost{background:transparent;color:var(--gray)}
+.btn:disabled{opacity:.45;cursor:default}
+main{padding:26px 0 60px}
+section.part{margin:34px 0 10px}
+section.part h2{margin:0 0 4px;font-size:22px;color:var(--navy);display:flex;align-items:center;gap:10px}
+section.part h2 .pn{display:inline-flex;align-items:center;justify-content:center;width:34px;height:34px;border-radius:8px;background:var(--pcol);color:#fff;font-size:15px}
+section.part .pintro{background:#fff;border:1px solid var(--lgray);border-left:5px solid var(--pcol);border-radius:10px;padding:14px 18px;margin:12px 0 18px;font-size:14px}
+section.part .pintro h4{margin:0 0 6px;font-size:13px;color:var(--pcol)}
+section.part .pintro ul{margin:6px 0 0 18px;padding:0}
+section.part .pintro li{margin:2px 0}
+.card{background:#fff;border:1px solid var(--lgray);border-radius:12px;padding:18px 20px 16px;margin:14px 0;position:relative}
+.card.ok{border-color:var(--ok);box-shadow:inset 4px 0 0 var(--ok)}
+.card.bad{border-color:var(--bad);box-shadow:inset 4px 0 0 var(--bad)}
+.card .head{display:flex;align-items:center;gap:10px;margin-bottom:8px;flex-wrap:wrap}
+.card .num{font-size:12px;font-weight:700;color:var(--pcol);background:var(--ptint);padding:2px 9px;border-radius:999px}
+.card .typ{font-size:11px;color:var(--gray);border:1px solid var(--lgray);padding:1px 7px;border-radius:999px}
+.card h3{margin:0;font-size:16px;flex:1 1 100%}
+.card .q{font-size:14.5px;margin:6px 0 12px}
+.card .q p{margin:6px 0}
+pre{background:var(--code);color:var(--codefg);border-radius:10px;padding:14px 16px;overflow-x:auto;font-family:Consolas,"D2Coding","Courier New",monospace;font-size:13px;line-height:1.5;margin:10px 0}
+pre .cm{color:#86EFAC}
+code{font-family:Consolas,"D2Coding","Courier New",monospace;background:var(--soft);padding:1px 5px;border-radius:4px;font-size:.92em}
+pre code{background:none;padding:0}
+input.blank{font:inherit;font-family:Consolas,monospace;font-size:13px;padding:1px 6px;border:none;border-bottom:2px solid #FCD34D;background:#2B3446;color:#FCD34D;min-width:60px;width:auto;outline:none;border-radius:3px 3px 0 0}
+input.blank.ok{border-bottom-color:#34D399;color:#34D399}
+input.blank.bad{border-bottom-color:#F87171;color:#F87171}
+.choices{display:flex;flex-direction:column;gap:7px;margin:8px 0}
+.choices label{display:flex;gap:10px;align-items:flex-start;padding:9px 12px;border:1px solid var(--lgray);border-radius:9px;cursor:pointer;font-size:14px;background:#fff}
+.choices label:hover{border-color:var(--accent)}
+.choices label.sel{border-color:var(--accent);background:var(--tint)}
+.choices label.right{border-color:var(--ok);background:#E3F4F3}
+.choices label.wrong{border-color:var(--bad);background:#FAE7EC}
+.choices input{margin-top:3px}
+.choices .k{font-weight:700;color:var(--gray);min-width:18px}
+.numrow{display:flex;align-items:center;gap:8px;flex-wrap:wrap;margin:8px 0}
+.numrow input{font:inherit;font-size:15px;padding:7px 10px;border:1px solid var(--lgray);border-radius:8px;width:200px}
+.numrow input.ok{border-color:var(--ok);background:#E3F4F3}
+.numrow input.bad{border-color:var(--bad);background:#FAE7EC}
+.numrow .unit{color:var(--gray);font-size:13px}
+.actions{display:flex;gap:8px;align-items:center;margin-top:10px;flex-wrap:wrap}
+.fb{font-size:13.5px;margin-top:10px;padding:10px 14px;border-radius:9px;display:none}
+.fb.show{display:block}
+.fb.ok{background:#E3F4F3;color:#0B5F5B}
+.fb.bad{background:#FAE7EC;color:#8E2547}
+.hint,.explain{display:none;font-size:13.5px;margin-top:10px;padding:10px 14px;border-radius:9px}
+.hint.show,.explain.show{display:block}
+.hint{background:#FEF3E2;border-left:4px solid var(--warn)}
+.explain{background:var(--soft);border-left:4px solid var(--navy)}
+.explain h5,.hint h5{margin:0 0 4px;font-size:12px;letter-spacing:.3px}
+.explain pre{margin:8px 0 0}
+table{border-collapse:collapse;font-size:13.5px;margin:8px 0;width:auto}
+th,td{border-top:1px solid var(--lgray);border-bottom:1px solid var(--lgray);padding:6px 12px;text-align:left;vertical-align:top}
+th{background:var(--navy);color:#fff;font-weight:700}
+tr:nth-child(even) td{background:var(--soft)}
+.calc{background:var(--soft);border:1px dashed var(--lgray);border-radius:10px;padding:12px 14px;margin:8px 0}
+.calc .row{display:flex;gap:8px;align-items:center;flex-wrap:wrap;margin:6px 0}
+.calc input,.calc select{font:inherit;font-size:14px;padding:5px 8px;border:1px solid var(--lgray);border-radius:6px;width:150px}
+.calc .out{font-family:Consolas,monospace;font-size:13px;background:#fff;border:1px solid var(--lgray);border-radius:8px;padding:10px 12px;white-space:pre-wrap;margin-top:6px}
+.summary{background:#fff;border:1px solid var(--lgray);border-radius:12px;padding:20px 22px;margin-top:36px}
+.summary h2{margin:0 0 10px;color:var(--navy)}
+.summary .bar{display:grid;grid-template-columns:1fr auto;gap:6px 14px;align-items:center;font-size:14px}
+.summary .pb{height:9px;background:var(--soft);border-radius:999px;overflow:hidden;border:1px solid var(--lgray)}
+.summary .pb i{display:block;height:100%;background:var(--accent)}
+.kbd{font-size:11px;color:var(--gray)}
+footer{color:var(--gray);font-size:12px;text-align:center;padding:20px 0 40px}
+.mark{background:#FEF3C7;padding:0 3px;border-radius:3px}
+.card.lab{border-left:5px solid var(--pcol);background:#FBFBFD}
+.labout .lbl,.tasks .lbl{font-size:11px;font-weight:700;color:var(--gray);letter-spacing:.3px;margin:8px 0 4px}
+pre.out{background:#F5F6F8;color:#1F2937;border:1px solid var(--lgray);max-height:420px;overflow:auto}
+pre.prompt{background:#FFFBEB;color:#1F2937;border:1px solid #FCD34D;white-space:pre-wrap;font-family:"Malgun Gothic","맑은 고딕","Noto Sans KR",system-ui,sans-serif;font-size:13.5px}
+.pb{display:grid;grid-template-columns:110px 1fr;gap:6px 10px;align-items:start;margin:6px 0}
+.pb label{font-size:12.5px;font-weight:700;color:var(--gray);padding-top:6px}
+.pb textarea,.pb input{font:inherit;font-size:13.5px;padding:6px 8px;border:1px solid var(--lgray);border-radius:6px;width:100%;resize:vertical;min-height:34px}
+.pb .miss{border-color:var(--warn);background:#FEF3E2}
+@media(max-width:520px){.pb{grid-template-columns:1fr}}
+.labout img{max-width:100%;border:1px solid var(--lgray);border-radius:8px;margin:6px 0;background:#fff}
+.tasks ol{margin:4px 0 0 20px;padding:0;font-size:14px}
+.tasks li{margin:3px 0}
+@media print{.topbar,.actions,.btn{display:none}.hint,.explain,.fb{display:block}}
+</style>
+</head>
+<body>
+<header><div class="wrap">
+  <span class="chip">머신러닝 프로젝트 (RISE) · 실습</span> <span class="chip soft">2주차</span>
+  <h1>프롬프트 기반 개발과 AI 코딩 도구</h1>
+  <div class="sub">도구 지형 → 프롬프트 6요소 → 생성·실행·수정 루프 → 생성 코드 검증. 2주차 슬라이드의 LAB 2-1~2-6을 실제 코드·실행 결과로 따라가고, 확인 문제로 점검합니다 (도구는 Copilot·ChatGPT·Claude·Gemini·Cursor 무엇이든)</div>
+</div></header>
+<div class="topbar"><div class="wrap">
+  <div class="prog"><i id="progbar"></i></div>
+  <div class="score">푼 문제 <b id="s-done">0</b>/<b id="s-total">0</b> · 정답 <b id="s-right">0</b> · 점수 <b id="s-score">0</b>/<b id="s-max">0</b></div>
+  <nav class="parts" id="partnav"></nav>
+  <button class="btn ghost" id="btn-reset" title="이 장의 풀이 기록을 지웁니다">기록 초기화</button>
+</div></div>
+<main><div class="wrap" id="main"></div></main>
+<footer>머신러닝 프로젝트 (RISE) · 실습 · 풀이 기록은 이 브라우저(localStorage)에만 저장됩니다.</footer>
+<script id="data" type="application/json">{"chapter": 2, "key": "mlproj_practice_w", "color": "#4F5BD5", "title": "프롬프트 기반 개발과 AI 코딩 도구", "subtitle": "도구 지형 → 프롬프트 6요소 → 생성·실행·수정 루프 → 생성 코드 검증. 2주차 슬라이드의 LAB 2-1~2-6을 실제 코드·실행 결과로 따라가고, 확인 문제로 점검합니다 (도구는 Copilot·ChatGPT·Claude·Gemini·Cursor 무엇이든)", "parts": [{"name": "바이브코딩과 AI 코딩 도구", "short": "도구·원리", "color": "#0E8C86", "intro": "<ul><li>도구는 세 유형(대화형 웹 · IDE 통합 · 에이전트 CLI)이지만 원리는 하나 — <b>다음 토큰을 확률로 고른다<\/b>. 컨텍스트 창 밖은 모른다.<\/li><li>그래서 규칙 다섯: <b>맥락을 넣어라 · 작게 쪼개라 · 최신 API는 문서로 · 같은 질문도 답이 다르다 · 틀릴 수 있다는 전제로 검증<\/b>.<\/li><li>흔한 환각 3종(없는 함수·옛 API·설치 안 된 라이브러리)은 <b>실행하면 즉시 드러난다<\/b>. 의도와 다른 로직은 드러나지 않는다.<\/li><li>바이브코딩이 아닌 것: 코드를 안 읽는 것, AI가 문제를 정의해 주는 것, 검증 생략, <b>수정 없이 그대로 제출<\/b>(수업계획서 금지).<\/li><\/ul>", "items": [{"type": "lab", "lab": "2-1", "title": "같은 요청, 다른 프롬프트 — CSV 요약 함수", "q": "먼저 **나쁜 프롬프트** `csv 분석 코드 짜줘`를 넣어 결과를 저장해 두고, 아래 **좋은 프롬프트**를 넣어 비교합니다. 아래 코드는 좋은 프롬프트로 받은 뒤 사람이 읽고 확정한 것(`practice/week2/summarize_csv.py`).", "prompt": "너는 pandas에 능숙한 파이썬 개발자다.\n[목표] CSV 경로를 받아 숫자 열의 요약표를 돌려주는 함수\n[입력] path: str   [출력] DataFrame (행=열 이름, 열=rows, missing, mean, std, min, max)\n[제약] pandas만 사용, 숫자 열이 없으면 빈 DataFrame, 한글 docstring, 함수 이름 summarize_csv\n[예시 데이터] data/telco_churn.csv (7,043행, 21열, TotalCharges는 문자열로 읽힘 — 요약에서 빠져도 됨)\n[출력 형식] 코드만, 설명은 주석으로\n\n(비교용 나쁜 프롬프트: \"csv 분석 코드 짜줘\")", "code": "\"\"\"LAB 2-1 · '좋은 프롬프트'로 생성한 CSV 요약 함수 (AI 생성 코드 → 검토 후 확정본)\"\"\"\nimport pandas as pd\n\n\ndef summarize_csv(path: str) -> pd.DataFrame:\n    \"\"\"CSV 파일의 숫자 열에 대해 행 수·결측 수·평균·표준편차·최소·최대를 표로 돌려준다.\n\n    - 숫자 열이 하나도 없으면 빈 DataFrame을 돌려준다.\n    - 문자열로 읽힌 숫자 열(예: 공백이 섞인 열)은 요약 대상에서 빠지므로 호출 전에 정리한다.\n    \"\"\"\n    df = pd.read_csv(path)\n    num = df.select_dtypes(include=\"number\")\n    if num.empty:\n        return pd.DataFrame()\n    out = pd.DataFrame({\n        \"rows\": num.count() + num.isna().sum(),\n        \"missing\": num.isna().sum(),\n        \"mean\": num.mean().round(2),\n        \"std\": num.std().round(2),\n        \"min\": num.min(),\n        \"max\": num.max(),\n    })\n    return out", "outlabel": "실행 결과 — python summarize_csv.py data/telco_churn.csv", "output": "rows  missing   mean    std    min     max\nSeniorCitizen   7043        0   0.16   0.37   0.00    1.00\ntenure          7043        0  32.37  24.56   0.00   72.00\nMonthlyCharges  7043        0  64.76  30.09  18.25  118.75", "tasks": ["나쁜 프롬프트로 받은 코드와 비교: **함수인가 스크립트인가? 숫자 열이 없을 때는? 열 이름은 내가 원한 것인가?** 차이를 프롬프트 로그에 한 줄로 적으세요.", "좋은 프롬프트의 `[제약]`에서 `숫자 열이 없으면 빈 DataFrame`을 지우고 다시 요청해 보세요. 그 경우를 AI가 알아서 처리하는지 확인하세요 (대개 처리하지 않습니다).", "`TotalCharges`가 요약표에 없는 이유를 코드에서 찾아 한 줄로 설명하세요."], "explain": "TotalCharges는 공백이 섞여 **문자열(object)로 읽히므로** `select_dtypes(include='number')`에서 빠집니다. 좋은 프롬프트의 `[예시 데이터]`에 이 사실을 적어 두었기 때문에 AI가 이를 '버그'로 오해하지 않았습니다 — 맥락의 힘."}, {"type": "mc", "title": "도구 유형", "q": "\"내 파일을 모르니 **코드와 오류를 직접 붙여넣어야** 한다\"는 주의 사항이 붙는 도구 유형은?", "choices": ["① 대화형 (웹) — ChatGPT · Claude · Gemini", "② IDE 통합 — VS Code + Copilot · Cursor", "③ 에이전트 CLI — Claude Code · Gemini CLI", "세 유형 모두 파일을 자동으로 읽는다"], "answer": 0, "hint": "IDE 통합 도구는 열린 파일을 `@file`/`#file`로 자동으로 넣어 준다.", "explain": "웹 대화형 도구는 여러분의 프로젝트 폴더를 볼 수 없습니다. 코드·오류·`df.head()`를 **직접** 붙여넣지 않으면 추측 코드가 나옵니다. IDE 통합(②)은 열린 파일을 자동으로 맥락에 넣고, 에이전트 CLI(③)는 파일을 읽고 명령까지 실행합니다."}, {"type": "multi", "title": "실행하면 드러나는 환각", "q": "검증 사다리 **1단(실행해 본다)** 만으로 잡히는 것을 모두 고르세요.", "choices": ["존재하지 않는 함수 `st.chart_bar()` 호출", "옛 API `st.cache` 사용 (현재는 `st.cache_data`)", "설치되지 않은 라이브러리 `import plotly`", "히스토그램 구간 수를 20이 아니라 10으로 그리는 로직", "결측이 있는 열에서 평균을 잘못 계산하는 경계값 처리"], "answer": [0, 1, 2], "points": 2, "hint": "실행은 '없는 것'을 잡는다. '의도와 다른 것'은 못 잡는다.", "explain": "A·B·C는 실행 즉시 `AttributeError`/`ModuleNotFoundError`로 드러납니다. D·E는 코드가 **돌아가긴 하므로** 실행으로는 안 잡히고, 2단(읽고 설명시킨다)·3단(테스트)이 필요합니다."}, {"type": "mc", "title": "바이브코딩이 아닌 것", "q": "다음 중 수업계획서 「학습자 AI 활용 원칙」이 **명시적으로 금지**하는 행위는?", "choices": ["AI가 생성한 코드를 실행·수정한 뒤 프롬프트 로그와 함께 제출", "AI에게 오류 메시지를 붙여넣고 해석을 요청", "AI 생성물을 학습자의 수정·보완 없이 그대로 제출", "테스트 코드를 AI에게 작성시키고 읽은 뒤 채택"], "answer": 2, "explain": "금지 3종: ① 수정·보완 없이 그대로 제출 ② 허위 인용·출처 ③ 평가 중 무허가 사용. A·B·D는 모두 권장되는 사용법이며, **기록**이 붙으면 점수가 됩니다(루브릭 AI 활용 기록 15점)."}, {"type": "predict", "title": "실행 결과 예측 — 숫자 열이 없는 CSV", "q": "열이 `b` 하나뿐이고 값이 문자열 `x, y`인 CSV에 `summarize_csv()`를 호출하면?", "code": "import pandas as pd\npd.DataFrame({'b': ['x', 'y']}).to_csv('t.csv', index=False)\nout = summarize_csv('t.csv')\nprint(out.empty)", "choices": ["`KeyError: 'b'`", "`True` — 빈 DataFrame이 반환된다", "`False` — b 열의 rows=2, missing=0 행이 나온다", "`ValueError: no numeric data`"], "answer": 1, "hint": "코드의 `if num.empty: return pd.DataFrame()`.", "explain": "`select_dtypes(include='number')`가 빈 프레임을 돌려주고, 좋은 프롬프트의 `[제약]`대로 빈 DataFrame이 반환됩니다. 실제 실행:\nEmpty DataFrame\nColumns: []\nIndex: []\nout.empty = True"}], "tint": "#E2F1F0"}, {"name": "프롬프트의 구조", "short": "6요소", "color": "#4F5BD5", "intro": "<ul><li><b>6요소 순서<\/b>: ① 역할 ② 목표 ③ 맥락 ④ 제약 ⑤ 출력 형식 ⑥ 예시. 전부 쓸 필요는 없지만 <b>빠진 요소는 AI가 추측으로 채운다<\/b>.<\/li><li>가장 자주 빠지는 것은 <b>③ 맥락<\/b>(현재 코드·데이터 구조·환경). LAB 2-4의 '총요금' 환각이 그 증거.<\/li><li>요구사항(막연) → 사용자 스토리 → 기능 명세(입력·처리·출력·완료 조건) → 프롬프트. <b>프롬프트는 명세의 번역<\/b>.<\/li><li>패턴 4종: 생성 · 수정(현재 코드 + 바꿀 것 1가지 + 바꾸지 말 것 + diff) · 설명 · 계획(코드 쓰지 말고 순서만).<\/li><\/ul>", "items": [{"type": "calc", "widget": "prompt", "title": "프롬프트 조립기 — 6요소를 채우면 프롬프트가 된다", "q": "여섯 칸을 채우고 **프롬프트 조립**을 누르세요. 빈 칸은 노란색으로 표시됩니다 — 그 요소를 AI가 추측한다는 뜻입니다. 조립된 텍스트를 복사해 실제 도구에 넣어 보세요."}, {"type": "lab", "lab": "2-2", "title": "내 서비스의 첫 프롬프트 — 스토리 → 명세 → 프롬프트", "q": "아직 팀 주제가 없어도 됩니다. 오늘 떠오르는 아이디어 하나로 **스토리 1개 → 명세 1개 → 프롬프트 1개**를 씁니다 (코드 실행 없음, 15분). 아래는 다른 주제의 예 — 형식만 참고하세요.", "prompt": "너는 Streamlit 개발자다.\n[목표] 기능 명세 US-1을 구현하는 페이지\n[맥락] Python 3.11, streamlit, 데이터 파일 없음, session_state로 누적\n[제약] 파일 하나, pandas·streamlit만\n[출력 형식] 코드만\n[예시] 3건 입력 → 합계 표시", "outlabel": "이 프롬프트가 번역한 스토리·명세", "output": "[스토리] 자취생으로서, 식비를 관리하기 위해, 영수증 금액을 입력하면 이번 달 지출 현황을 보고 싶다.\n\n[명세 US-1  우선순위 Must]\n입력: 날짜(기본 오늘) · 항목(선택) · 금액(정수)\n처리: 세션에 누적\n출력: 합계 · 항목별 막대\n완료 조건: 3건 입력 후 합계가 맞는다", "tasks": ["① 스토리: \"<누구>로서 <왜> <무엇>을 원한다\" 1문장 — 사용자가 **구체적인 한 사람**인가?", "② 명세: 입력(위젯·범위) · 처리 · 출력 · 완료 조건 — 완료 조건을 **눈으로 확인**할 수 있나?", "③ 프롬프트: 위 조립기에 6요소 순서대로. 맥락에 \"Streamlit, 파일 하나, 데이터 없음/있음\"을 명시 — AI가 추측할 여지가 남았나?", "④ (선택) 실제 도구에 넣고 결과 코드를 저장 → 3주차에 이어서. **오늘 수업 끝나기 전 ①~③ 텍스트를 LMS에 제출** (개인)."], "explain": "명세가 없으면 프롬프트가 흔들리고, 흔들리는 프롬프트는 매번 다른 코드를 낳습니다. 3주차 팀 기획서의 \"핵심 기능 3개\"가 여기서 나옵니다."}, {"type": "mc", "title": "가장 자주 빠지는 요소", "q": "프롬프트 6요소 중 **가장 자주 빠지고**, 빠지면 AI가 없는 열 이름·함수를 지어내게 되는 요소는?", "choices": ["① 역할", "③ 맥락 — 현재 코드·데이터 구조·환경", "⑤ 출력 형식", "⑥ 예시"], "answer": 1, "explain": "IDE 통합 도구는 열린 파일을 자동으로 넣어 주지만, 대화형 도구에는 코드·오류·`df.head()`를 **직접** 붙여넣어야 합니다. LAB 2-4의 `df[\"총요금\"]`이 맥락 없는 요청의 결과입니다."}, {"type": "fill", "title": "프롬프트의 요소 이름 채우기", "q": "3주차에 실제로 쓸 프롬프트입니다. 각 줄이 6요소 중 **무엇**인지 대괄호 안에 쓰세요 (예: `역할`).", "code": "너는 Streamlit 앱을 만드는 파이썬 개발자다.          # ① 역할\n[목표] 아래 기능 명세 US-1을 구현하는 페이지\n[___1___] 프로젝트 구조: app.py(홈), pages/, core.py에 churn_score(...) -> dict(score, level, reasons) 가 이미 있음\n[___2___] st.form 사용, core.churn_score 호출만(로직 재작성 금지), session_state에 조회 이력 저장, 파일 하나\n[___3___] pages/2_이탈_위험_체크.py 전체 코드\n[___4___] 입력 M2M·3개월·85달러·Fiber·No → 90점 \"높음\", 근거 5줄 표시", "blanks": [["맥락"], ["제약"], ["출력 형식", "출력형식", "출력", "형식"], ["예시"]], "hint": "순서: 역할 → 목표 → 맥락 → 제약 → 출력 형식 → 예시.", "explain": "**맥락**(이미 있는 코드) · **제약**(해야/하지 말아야 할 것) · **출력 형식**(파일 전체) · **예시**(입력→출력 샘플). 특히 제약의 \"로직 재작성 금지\"가 없으면 AI는 `core.py`를 무시하고 점수 계산을 다시 씁니다."}, {"type": "mc", "title": "패턴 고르기", "q": "3화면짜리 앱을 만들려 한다. 기능이 3개 이상일 때 **가장 먼저** 쓸 프롬프트 패턴은?", "choices": ["생성 — \"3화면 앱 전체를 파일 하나로, 코드만\"", "수정 — \"현재 코드에 화면 2개를 추가\"", "계획 — \"코드 쓰지 말고 파일 구조와 구현 순서, 각 단계의 확인 방법만\"", "설명 — \"Streamlit 멀티페이지가 뭔지 3줄로\""], "answer": 2, "explain": "기능이 3개 이상이면 **계획 → 생성을 한 단계씩**. 한 번에 전부 생성하면 앞부분을 잊거나, 깨진 곳이 어디인지 알 수 없습니다. 3주차 LAB 3-1이 바로 이 계획 프롬프트입니다."}, {"type": "mc", "title": "같은 요청이 세 번 실패했다", "q": "\"다시 해 봐\"를 세 번 반복했는데 같은 오류가 난다. 다음 행동으로 옳은 것은?", "choices": ["\"제발 제대로 해 줘\"라고 강조해서 다시 요청", "새 대화창을 열고 같은 프롬프트를 다시 넣는다", "문제를 더 작게 쪼개거나 **맥락(코드·오류·데이터)을 더 넣는다**", "도구를 바꾼다 — Copilot에서 ChatGPT로"], "answer": 2, "explain": "\"다시 해 봐\"는 같은 추측을 다시 시키는 것입니다. 실패가 반복되면 프롬프트를 고치지 말고 **문제의 크기와 맥락**을 바꾸세요. 도구 교체(D)는 원리가 같으므로 근본 해결이 아닙니다."}], "tint": "#E9EBF9"}, {"name": "생성 → 실행 → 수정 루프", "short": "루프", "color": "#C0395F", "intro": "<ul><li>한 바퀴 = 프롬프트 → 생성 → <b>실행<\/b> → 관찰 → <b>되돌려 주기<\/b>(오류 전체 · 기대 vs 실제 · 바뀐 맥락).<\/li><li><b>한 바퀴에 하나만<\/b>. 기능 추가는 되는 상태에서만. 되는 버전은 다른 이름(v1, v2 …)으로 저장.<\/li><li>Streamlit 규칙 하나: <b>위젯을 만질 때마다 스크립트 전체가 위에서 아래로 다시 실행<\/b>된다. 오류는 브라우저 화면에 Traceback으로 뜬다 → 복사.<\/li><li>LAB 2-4의 v1은 <b>일부러<\/b> 깨져 있다. Traceback을 통째로 AI에게 되돌려 주는 연습.<\/li><\/ul>", "items": [{"type": "lab", "lab": "2-3", "title": "첫 Streamlit 앱 — 프롬프트 한 번으로 화면 띄우기", "q": "입력 2개(이름·슬라이더) + 버튼 → 메시지. `streamlit run app_hello.py`로 띄우고 되면 화면을 캡처해 둡니다 (10분).", "prompt": "너는 Streamlit 개발자다.\n[목표] 이름 입력 + 1~10 슬라이더 + \"확인\" 버튼. 버튼을 누르면 \"OO님, 자신감 N/10 — …\" 성공 메시지\n[제약] 파일 하나(app_hello.py), 이름이 비면 경고 표시\n[출력] 코드만", "code": "\"\"\"LAB 2-3 · 첫 Streamlit 앱 — 프롬프트 한 번으로 만든 화면\"\"\"\nimport streamlit as st\n\nst.title(\"첫 번째 바이브코딩 앱\")\nname = st.text_input(\"이름을 입력하세요\")\nlevel = st.slider(\"파이썬 자신감 (1~10)\", 1, 10, 5)\n\nif st.button(\"확인\"):\n    if not name.strip():\n        st.warning(\"이름을 먼저 입력해 주세요.\")\n    else:\n        st.success(f\"{name}님, 자신감 {level}/10 — 오늘 앱을 하나 만들어 봅시다!\")", "outlabel": "화면에서 확인한 것 (streamlit AppTest로 자동 확인한 실제 값)", "output": "[제목] 첫 번째 바이브코딩 앱\n[위젯] 이름을 입력하세요 | 파이썬 자신감 (1~10) | 버튼: 확인\n[빈 이름 + 확인] warning: 이름을 먼저 입력해 주세요.\n[수원 · 7 + 확인] success: 수원님, 자신감 7/10 — 오늘 앱을 하나 만들어 봅시다!", "tasks": ["빈 이름에서 경고가 뜨나 — 입력 없이 \"확인\" 클릭 → 노란 경고", "슬라이더 값이 메시지에 반영되나 — 7로 옮기고 클릭 → \"7/10\"", "코드를 읽고 설명할 수 있나 — `st.button`이 `True`가 되는 순간은 언제인가? (아래 문제)"], "explain": "`pip install streamlit pandas` → `streamlit run app_hello.py` → `http://localhost:8501` 자동 열림. 파일을 저장하면 우상단 \"Rerun\"이 뜨거나 자동 갱신됩니다. 종료는 터미널 `Ctrl+C`."}, {"type": "predict", "title": "st.button은 언제 True인가", "q": "위 앱에서 \"확인\"을 한 번 누른 뒤, 슬라이더를 5→8로 옮겼다. 화면의 성공 메시지는?", "code": "if st.button(\"확인\"):\n    ...\n    st.success(f\"{name}님, 자신감 {level}/10 — ...\")", "choices": ["\"8/10\"으로 갱신된 채 남아 있다", "\"5/10\" 그대로 남아 있다", "**사라진다** — 슬라이더 조작으로 스크립트가 재실행되고, 그 재실행에서는 버튼이 눌리지 않았으므로 `st.button()`이 False", "오류가 난다"], "answer": 2, "hint": "위젯을 만질 때마다 스크립트 전체가 맨 위부터 다시 실행된다. `st.button`은 '클릭한 그 재실행' 한 번만 True.", "explain": "Streamlit의 규칙: 위젯 조작 = 전체 재실행. `st.button()`은 클릭이 일어난 **그 한 번의 재실행**에서만 True이므로, 슬라이더를 움직인 재실행에서는 False가 되어 메시지가 사라집니다. \"값이 사라진다\"는 질문의 답은 3주차 `session_state`."}, {"type": "lab", "lab": "2-4", "title": "오류 메시지를 그대로 되돌려 주기 — 일부러 깨진 v1", "q": "`app_csv.py`(v1)에 `data/telco_churn.csv`를 올리면 브라우저에 Traceback이 뜹니다. **마지막 줄만 말고 전체**를 복사해 아래 프롬프트에 붙여 넣고 고칩니다 (10분).", "code": "\"\"\"LAB 2-4 · CSV 업로드 → 요약 통계 (오류 루프 실습용, v1)\"\"\"\nimport pandas as pd\nimport streamlit as st\n\nst.title(\"CSV 요약 도구\")\nfile = st.file_uploader(\"CSV 파일을 올려 주세요\", type=\"csv\")\n\nif file is not None:\n    df = pd.read_csv(file)\n    st.write(f\"{df.shape[0]:,}행 × {df.shape[1]}열\")\n    st.dataframe(df.head())\n    st.subheader(\"숫자 열 요약\")\n    st.dataframe(df.describe().T)\n    # v1 버그: 존재하지 않는 열 이름 → KeyError (LAB 2-4에서 오류 메시지를 AI에게 붙여넣는다)\n    st.metric(\"평균 총요금\", round(df[\"총요금\"].mean(), 1))", "outlabel": "브라우저(또는 터미널)에 뜨는 오류 — 실제 실행", "output": "(7043, 21)\nTraceback (most recent call last):\n  File \".../site-packages/pandas/core/indexes/base.py\", line 3812, in get_loc\n    return self._engine.get_loc(casted_key)\n           ~~~~~~~~~~~~~~~~~~~~^^^^^^^^^^^^\n  File \"pandas/_libs/index.pyx\", line 167, in pandas._libs.index.IndexEngine.get_loc\n  File \"pandas/_libs/index.pyx\", line 196, in pandas._libs.index.IndexEngine.get_loc\n  File \"pandas/_libs/hashtable_class_helper.pxi\", line 7088, in pandas._libs.hashtable.PyObjectHashTable.get_item\n  File \"pandas/_libs/hashtable_class_helper.pxi\", line 7096, in pandas._libs.hashtable.PyObjectHashTable.get_item\nKeyError: '총요금'\n\nThe above exception was the direct cause of the following exception:\n\nTraceback (most recent call last):\n  File \"app_csv.py\", line 15, in <module>\n    st.metric(\"평균 총요금\", round(df[\"총요금\"].mean(), 1))\n    ~~^^^^^^^^^^\n  File \".../site-packages/pandas/core/frame.py\", line 4113, in __getitem__\n    indexer = self.columns.get_loc(key)\n  File \".../site-packages/pandas/core/indexes/base.py\", line 3819, in get_loc\n    raise KeyError(key) from err\nKeyError: '총요금'", "prompt": "아래 Streamlit 앱에서 telco_churn.csv를 올리면 오류가 난다.\n[오류] (위 Traceback 전체 붙여넣기)\n[데이터 열] customerID, gender, SeniorCitizen, ..., MonthlyCharges, TotalCharges(문자열, 공백 섞임), Churn\n[요청] 존재하지 않는 열을 가정하지 말고, 숫자 열이 있을 때만 요약하도록 고쳐 줘. 바뀐 부분만 diff로.\n--- (현재 코드 전체 붙여넣기) ---", "tasks": ["열 이름 목록(`[데이터 열]`)을 **빼고** 요청해 보세요. AI가 `총요금` 대신 또 다른 열 이름(예: `TotalCharge`)을 지어내는지 관찰하세요 — 그것도 교훈.", "고친 결과가 다음 LAB의 v2 앞부분(`select_dtypes` + `st.stop()`)과 같은 구조인지 비교하세요.", "프롬프트 로그에 이 왕복을 한 줄로: 도구 · 목적(KeyError 해석) · 프롬프트 요약(Traceback + 열 목록) · 검증(실행 확인) · 채택."], "explain": "왜 '총요금'인가 — AI가 **데이터를 모른 채** 그럴듯한 한국어 열 이름을 지어낸 전형적 환각(맥락 부재). 열 목록을 넣으면 재발하지 않습니다. `df.describe().T`는 이미 숫자 열만 요약하므로 그 줄은 죄가 없습니다."}, {"type": "predict", "title": "KeyError의 원인", "q": "`st.metric(\"평균 총요금\", round(df[\"총요금\"].mean(), 1))`에서 `KeyError: '총요금'`이 난 **근본 원인**은?", "choices": ["pandas 버전이 오래되어 한글 열 이름을 지원하지 않는다", "CSV 인코딩 문제로 열 이름이 깨졌다", "AI가 데이터 구조를 모른 채 존재하지 않는 열 이름을 **추측(환각)** 했다", "`file_uploader`가 파일을 두 번 읽었다"], "answer": 2, "explain": "telco_churn.csv에는 `TotalCharges`는 있어도 `총요금`은 없습니다. 프롬프트에 열 목록·`df.head()`가 없었기 때문에 그럴듯한 이름을 생성한 것. 해결은 라이브러리 교체가 아니라 **맥락 추가**."}, {"type": "fill", "title": "오류 수정분 — 숫자 열이 있을 때만", "q": "LAB 2-4의 결과 코드입니다. 빈칸을 채우세요.", "code": "num_cols = df.select_dtypes(include=___1___).columns.tolist()\nif not num_cols:\n    st.warning(\"숫자 열이 없어 요약할 수 없습니다.\")\n    st.___2___()          # 여기서 스크립트 실행을 멈춘다\nst.dataframe(df[num_cols].describe().T)", "blanks": [["'number'", "\"number\"", "'number'", "np.number", "'float'"], ["stop"]], "hint": "숫자 dtype 선택자 문자열 / 실행을 여기서 끝내는 Streamlit 함수.", "explain": "`select_dtypes(include='number')`로 숫자 열만 고르고, 없으면 `st.stop()`으로 아래 코드를 실행하지 않습니다. `st.stop()`을 지우면 빈 목록으로 `selectbox`를 만들다 또 다른 오류가 납니다 — 설명 프롬프트로 물어볼 만한 지점."}, {"type": "lab", "lab": "2-5", "title": "기능 하나 추가 — \"수정\" 패턴", "q": "v1을 고친 뒤(되는 상태!), 열을 골라 히스토그램을 그리는 기능을 **한 바퀴에 하나씩** 추가합니다 (15분). 현재 코드 전체를 프롬프트 뒤에 붙입니다.", "prompt": "아래 app_csv.py에 기능 하나를 추가해 줘.\n[추가] 숫자 열 중 하나를 selectbox로 고르고, 구간 수 슬라이더(5~50, 기본 20)로 히스토그램을 st.bar_chart로\n[제약] 기존 요약 부분은 그대로. numpy.histogram 사용. 캡션에 평균과 결측 건수\n[출력] 바뀐 부분만\n--- (현재 코드 전체 붙여넣기) ---", "code": "\"\"\"LAB 2-4/2-5 · CSV 업로드 → 요약 통계 + 열 선택 히스토그램 (오류 수정 + 기능 추가, v2)\"\"\"\nimport numpy as np\nimport pandas as pd\nimport streamlit as st\n\nst.title(\"CSV 요약 도구\")\nfile = st.file_uploader(\"CSV 파일을 올려 주세요\", type=\"csv\")\n\nif file is None:\n    st.info(\"왼쪽 위 버튼으로 CSV를 올리면 요약이 나타납니다. 예: data/telco_churn.csv\")\n    st.stop()\n\ndf = pd.read_csv(file)\nst.write(f\"{df.shape[0]:,}행 × {df.shape[1]}열\")\nst.dataframe(df.head())\n\nnum_cols = df.select_dtypes(include=\"number\").columns.tolist()\nif not num_cols:\n    st.warning(\"숫자 열이 없어 요약할 수 없습니다.\")\n    st.stop()\n\nst.subheader(\"숫자 열 요약\")\nst.dataframe(df[num_cols].describe().T)\n\n# v2에서 추가: 열을 골라 히스토그램\ncol = st.selectbox(\"히스토그램을 볼 열\", num_cols)\nbins = st.slider(\"구간 수\", 5, 50, 20)\ncounts, edges = np.histogram(df[col].dropna(), bins=bins)\nhist = pd.DataFrame({\"count\": counts}, index=[f\"{edges[i]:.1f}\" for i in range(len(counts))])\nst.bar_chart(hist)\nst.caption(f\"{col}: 평균 {df[col].mean():.2f}, 결측 {df[col].isna().sum()}건\")", "outlabel": "추가분이 계산하는 값 — tenure · 20구간 (실제 실행)", "output": "num_cols = ['SeniorCitizen', 'tenure', 'MonthlyCharges']\n        0.0  3.6  7.2  10.8  14.4  18.0  21.6  25.2  28.8  32.4  36.0  39.6  43.2  46.8  50.4  54.0  57.6  61.2  64.8  68.4\ncount  1062  550  358   401   266   304   348   208   278   217   230   264   186   266   218   277   279   222   363   746\ntenure: 평균 32.37, 결측 0건", "tasks": ["x축 라벨이 너무 많다 → \"구간 라벨을 5개마다 하나만\" 프롬프트로 한 바퀴 더.", "\"요약표를 CSV로 st.download_button\" 또는 \"st.scatter_chart로 x·y 선택\" 중 하나를 **되는 버전을 v3로 저장한 뒤** 추가 (과제 1).", "`bins` 슬라이더를 5로 내리면 첫 구간의 count가 어떻게 변하는지 예측하고 확인하세요 (0~14.4개월 묶음)."], "explain": "첫 구간(0~3.6개월)에 1,062명 — 가입 초기 고객이 가장 많고, 이들이 3주차 앱에서 이탈 위험 \"높음\"으로 분류되는 집단입니다. 한 바퀴마다 **되는 버전을 다른 이름으로 저장**(v1, v2 …)하거나 커밋 — \"잘 되던 게 갑자기 안 된다\"의 90%는 되돌아갈 버전이 없어서 생깁니다."}, {"type": "mc", "title": "Streamlit의 규칙 하나", "q": "Streamlit에서 슬라이더를 움직였을 때 스크립트는 **몇 번, 어디서부터** 실행되나?", "choices": ["슬라이더 아래 코드만 한 번", "슬라이더가 정의된 줄부터 끝까지", "스크립트 전체를 **맨 위부터** 한 번", "변경된 위젯과 연결된 함수만"], "answer": 2, "explain": "위젯을 만질 때마다 전체 재실행. 그래서 \"입력한 값이 사라진다\"는 질문이 가장 많고, 3주차 `session_state`에서 해결합니다. 오늘은 이 규칙만 기억."}, {"type": "multi", "title": "되돌려 줄 것", "q": "실행이 실패했을 때 AI에게 **되돌려 줄 것**으로 옳은 것을 모두 고르세요.", "choices": ["Traceback **전체** (마지막 줄만 말고)", "기대 vs 실제 — \"히스토그램이 나와야 하는데 빈 화면\"", "바뀐 맥락 — 새로 설치한 것, 바꾼 파일", "\"안 돼요. 다시 해 줘\" 한 줄", "오류 5개를 한꺼번에 모아서"], "answer": [0, 1, 2], "points": 2, "hint": "한 바퀴에 하나. 정보는 많이, 요청은 하나.", "explain": "D는 맥락이 없어 같은 추측을 반복시키고, E는 여러 개를 한꺼번에 던지면 어느 것이 고쳐졌는지 알 수 없습니다. **오류 하나 → 수정 하나 → 실행**."}], "tint": "#F7E7EB"}, {"name": "생성 코드 검증", "short": "검증·기록", "color": "#D97706", "intro": "<ul><li><b>검증 사다리<\/b>: 1단 실행(초) → 2단 읽고 설명시킨다(분) → 3단 테스트를 시킨다(10분) → 4단 사람이 리뷰(시간). 프로토타입은 1·2단 기본, 핵심 함수는 3단까지.<\/li><li>\"설명해 줘\"는 최고의 코드 리뷰 — 설명이 코드와 어긋나면 둘 중 하나가 틀렸다.<\/li><li>테스트는 순수 함수부터. 화면(Streamlit)은 테스트가 어렵다 → 로직을 <code>core.py<\/code>로 빼면 테스트도, 3단계 API 전환도 쉽다.<\/li><li><b>프롬프트 로그<\/b> = 정직성 증빙 + 팀 지식. 결정이 바뀐 프롬프트 10개 이내, \"틀린 사례\"가 점수(루브릭 15점).<\/li><\/ul>", "items": [{"type": "lab", "lab": "2-6", "title": "설명 · 테스트 · 리팩터를 시킨다", "q": "LAB 2-1의 `summarize_csv`에 대해 세 가지 요청을 **순서대로** (10분). 아래 테스트는 ② 요청으로 받아 사람이 읽고 확정한 것(`test_summarize_csv.py`).", "prompt": "① 설명: 아래 함수가 하는 일을 3줄로, 그리고 입력이 비었거나 숫자 열이 없을 때 무슨 일이 생기는지.\n② 테스트: pytest로 테스트 2개 — (a) 문자열 열은 빠지고 결측 수가 맞는지 (b) 숫자 열이 없으면 빈 DataFrame인지. tmp_path로 임시 CSV를 만들어 쓸 것.\n③ 리팩터: rows 계산이 어색하다(count + isna). 더 단순한 표현으로 바꾸되 결과는 같아야 한다.\n--- (summarize_csv.py 전체 붙여넣기) ---", "code": "\"\"\"LAB 2-6 · AI에게 요청해 만든 pytest 테스트 (생성 후 사람이 읽고 확정)\"\"\"\nimport pandas as pd\nfrom summarize_csv import summarize_csv\n\n\ndef test_numeric_columns_only(tmp_path):\n    p = tmp_path / \"t.csv\"\n    pd.DataFrame({\"a\": [1, 2, None], \"b\": [\"x\", \"y\", \"z\"]}).to_csv(p, index=False)\n    out = summarize_csv(str(p))\n    assert list(out.index) == [\"a\"]          # 문자열 열 b는 빠진다\n    assert out.loc[\"a\", \"missing\"] == 1\n    assert out.loc[\"a\", \"rows\"] == 3\n\n\ndef test_no_numeric_returns_empty(tmp_path):\n    p = tmp_path / \"t.csv\"\n    pd.DataFrame({\"b\": [\"x\", \"y\"]}).to_csv(p, index=False)\n    assert summarize_csv(str(p)).empty", "outlabel": "실행 결과 — 실제 pytest", "output": "$ pytest -q test_summarize_csv.py\n2 passed in 0.19s", "tasks": ["① 설명 결과를 코드와 대조: \"숫자 열이 없으면 빈 DataFrame\"이 코드와 일치하나? 설명에 없는 동작이 코드에 있나?", "② 테스트가 **통과하는지**보다 **내 명세를 검사하는지** 확인. 명세에 없는 것을 검사하는 테스트가 생겼다면 지운다.", "③ `rows`를 `len(num)`으로 바꾼 뒤 `pytest -q`를 다시 돌려 2개가 여전히 통과하는지 = 회귀 확인. 이것까지가 한 바퀴."], "explain": "테스트가 있으면 AI의 수정을 겁내지 않아도 됩니다 — 4주차 팀 개발에서 다른 사람 코드를 고칠 때 특히. `tmp_path`는 pytest가 주는 임시 폴더(테스트마다 새로 생성)라 실제 데이터 파일 없이도 돌아갑니다."}, {"type": "fill", "title": "테스트 코드 빈칸", "q": "숫자 열이 없으면 빈 DataFrame인지 검사하는 테스트입니다.", "code": "def test_no_numeric_returns_empty(___1___):\n    p = ___1___ / \"t.csv\"\n    pd.DataFrame({\"b\": [\"x\", \"y\"]}).to_csv(p, index=False)\n    assert summarize_csv(str(p)).___2___", "blanks": [["tmp_path"], ["empty"]], "hint": "pytest가 주는 임시 폴더 fixture / DataFrame이 비었는지 알려 주는 속성.", "explain": "`tmp_path`는 pytest 내장 fixture(테스트마다 새 임시 디렉터리). `DataFrame.empty`는 행 또는 열이 0이면 True. 프롬프트에 \"tmp_path로 임시 CSV를 만들어 쓸 것\"이라고 **제약**을 넣었기 때문에 실제 파일 경로에 의존하는 테스트가 나오지 않았습니다."}, {"type": "mc", "title": "검증 사다리", "q": "검증 사다리 1단(실행)은 통과했는데 결과가 이상하다. 예: 결측이 3건인데 표에는 0으로 나온다. 다음 단은?", "choices": ["4단 사람이 리뷰 — 처음부터 다시 읽는다", "2단 \"이 코드에서 missing을 어떻게 계산하는지 3줄로 설명해 줘\" → 설명과 코드가 어긋나는 곳을 찾는다", "프롬프트를 처음부터 다시 써서 재생성", "결측이 없는 파일로 바꿔서 시연"], "answer": 1, "explain": "2단(설명)은 분 단위 비용으로 **의도와 다른 로직·하드코딩·빠진 예외**를 잡습니다. 재생성(C)은 같은 실수를 반복할 수 있고, D는 검증 생략 = 바이브코딩이 아닌 것."}, {"type": "mc", "title": "리팩터 — 결과는 같게", "q": "`\"rows\": num.count() + num.isna().sum()`을 더 단순하게 바꾸되 결과가 같아야 한다. 옳은 것은?", "choices": ["`\"rows\": num.count()` — 결측을 뺀 개수", "`\"rows\": len(num)` — 결측 포함 행 수", "`\"rows\": num.shape[1]` — 열 수", "`\"rows\": num.sum()` — 값의 합"], "answer": 1, "hint": "`count()`는 결측을 빼고 센다. 거기에 결측 수를 다시 더하면?", "explain": "`count() + isna().sum()` = 결측 제외 개수 + 결측 개수 = **전체 행 수** = `len(num)`. 바꾼 뒤 `pytest -q`를 다시 돌려 `rows == 3`(결측 1건 포함) 테스트가 통과하는지 확인하는 것까지가 리팩터입니다."}, {"type": "multi", "title": "프롬프트 로그에 남길 것", "q": "AI 활용 기록(프롬프트 로그, 템플릿 03)에 **남겨야 할 것**을 모두 고르세요.", "choices": ["결정이 바뀐 프롬프트 (10개 이내)", "AI가 틀렸던 사례와 내가 어떻게 잡았는지", "어떻게 검증·수정했는지, 채택 여부", "\"다시 해 봐\" 류를 포함한 모든 대화 전문", "AI가 생성한 코드 전문"], "answer": [0, 1, 2], "points": 2, "explain": "로그는 ① 정직성 증빙 ② 팀원이 같은 삽질을 반복하지 않게 ③ 5주차 발표의 \"AI 활용·배운 점\" 재료. 전문(D·E)은 아무도 읽지 않습니다. **틀린 사례가 없다는 것은 검증을 안 했다는 뜻**으로 읽힙니다."}, {"type": "mc", "title": "왜 로직을 함수로 빼나", "q": "3주차 앱에서 점수 계산을 화면 코드 안에 두지 않고 `core.py`의 `churn_score()`로 분리하는 이유로 **가장 알맞은** 것은?", "choices": ["Streamlit이 함수 밖 코드를 실행하지 못하기 때문", "화면은 테스트가 어렵고, 함수로 빼면 **pytest로 검증**할 수 있으며 3단계에서 REST API 호출로 **갈아 끼우기** 쉽기 때문", "파일이 여러 개여야 GitHub에 올릴 수 있기 때문", "AI가 짧은 파일만 읽을 수 있기 때문"], "answer": 1, "explain": "순수 함수는 입력→출력이 분명해 테스트하기 쉽고, 2단계에서 학습 모델로, 3단계에서 `requests.post()`로 몸통만 바꿀 수 있습니다. 검증 사다리 3단이 가능해지는 구조적 조건."}], "tint": "#FAEEE1"}, {"name": "정리와 과제", "short": "정리", "color": "#1B2A4A", "items": [{"type": "note", "title": "한 장 요약 — 도구는 바뀌어도 이 표는 바뀌지 않는다", "table": [["주제", "핵심", "오늘 실습에서"], ["도구 지형", "대화형 · IDE 통합 · 에이전트 — 원리는 같다(확률 생성·컨텍스트 창)", "Copilot Chat / ChatGPT 등 자유 선택"], ["프롬프트 6요소", "역할 · 목표 · 맥락 · 제약 · 출력 형식 · 예시. 빠진 것은 추측된다", "LAB 2-1 나쁜 vs 좋은, LAB 2-2 내 서비스, 조립기"], ["명세 → 프롬프트", "스토리 → 기능 명세(입력·처리·출력·완료 조건) → 프롬프트", "LAB 2-2"], ["루프", "한 바퀴에 하나 · 오류는 전체 붙여넣기 · 되는 버전 저장", "LAB 2-3 첫 앱, 2-4 오류, 2-5 추가"], ["검증 사다리", "실행 → 설명 → 테스트 → 리뷰. 로직은 함수로 분리", "LAB 2-6 pytest 2개"], ["기록", "프롬프트 로그 10개 이내, 틀린 사례 포함", "`practice/week2/PROMPT_LOG_TEMPLATE.md` · 템플릿 03"]], "explain": "셀프 체크 5문항(슬라이드 24)의 답도 이 표 안에 있습니다."}, {"type": "note", "title": "과제 — 다음 주 수업 전까지 (개인, LMS)", "table": [["#", "과제", "제출물", "기준"], ["1", "LAB 2-5 앱에 \"해 보기\" 중 하나 이상 추가", "`app_csv_v3.py` + 실행 화면 캡처", "실행되고, 추가 기능이 동작"], ["2", "LAB 2-2에서 쓴 프롬프트로 실제 코드 생성 → 실행", "코드 파일 + 캡처 + 완료 조건 충족 여부 한 줄", "완료 조건 대비 결과를 정직하게"], ["3", "프롬프트 로그 (과제 1·2 과정)", "템플릿 03, 5~10행", "\"틀렸던 사례\" 1개 이상"], ["4", "(준비) GitHub 계정 + Student Pack 신청 · Git 설치", "계정 아이디", "3주차 배포 실습에 필요"]], "explain": "3주차 예고: **웹/앱 프로토타입 구현** — 화면 설계(와이어프레임→프롬프트) · 레이아웃·상태(`session_state`)·다중 페이지 · 실행·배포(GitHub + Streamlit Community Cloud). 수업 후 팀별 주제 확정·역할 분담(팀 기획서 1장). 수업 전에 서비스 아이디어 2개를 생각해 오세요."}], "tint": "#E3E5E9"}], "tint": "#E9EBF9"}</script>
+<script>
+(function(){
+const D = JSON.parse(document.getElementById('data').textContent);
+const KEY = (D.key||'ml2_practice_ch') + D.chapter;
+let state = {}; try{ state = JSON.parse(localStorage.getItem(KEY)||'{}')||{}; }catch(e){ state={}; }
+function save(){ try{ localStorage.setItem(KEY, JSON.stringify(state)); }catch(e){} }
+const $ = (s,el)=> (el||document).querySelector(s);
+const esc = s => String(s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;');
+function md(s){ // minimal markup: **bold**, `code`, newlines
+  if(!s) return '';
+  return s.split('\n').map(line=> line.replace(/\*\*(.+?)\*\*/g,'<b>$1</b>').replace(/`([^`]+)`/g,(m,c)=>'<code>'+esc(c)+'</code>')).join('<br>');
+}
+function codeHtml(code){ return esc(code).replace(/(#[^\n]*)/g,'<span class="cm">$1</span>'); }
+function norm(s){ return String(s||'').trim().toLowerCase().replace(/\s+/g,' ').replace(/[‘’]/g,"'").replace(/[“”]/g,'"'); }
+function normCode(s){ return norm(s).replace(/\s*([=,()\[\]:+\-*\/])\s*/g,'$1').replace(/"/g,"'"); }
+function parseNum(s){ s=String(s).trim().replace(/,/g,'').replace(/[^0-9eE+\-.×x*\/^]/g,''); if(!s) return NaN; try{ if(/[×x*\/^]/.test(s)){ return Function('"use strict";return ('+s.replace(/[×x]/g,'*').replace(/\^/g,'**')+')')(); } return parseFloat(s);}catch(e){ return NaN; } }
+
+const items = []; // flat list with part index
+D.parts.forEach((p,pi)=> p.items.forEach((it,ii)=>{ it._pi=pi; it._ii=ii; it._id = D.chapter+'-'+(pi+1)+'-'+(ii+1); it.points = it.points||1; items.push(it); }));
+const graded = items.filter(it=> it.type!=='calc' && it.type!=='note' && it.type!=='lab');
+$('#s-total').textContent = graded.length;
+$('#s-max').textContent = graded.reduce((a,b)=>a+b.points,0);
+
+// ---------- render ----------
+const main = $('#main');
+const nav = $('#partnav');
+D.parts.forEach((p,pi)=>{
+  const sec = document.createElement('section'); sec.className='part'; sec.id='part'+(pi+1);
+  sec.style.setProperty('--pcol', p.color); sec.style.setProperty('--ptint', p.tint);
+  sec.innerHTML = '<h2><span class="pn">'+(pi+1)+'</span>'+esc(p.name)+'</h2>'
+    + (p.intro ? '<div class="pintro"><h4>핵심 요약</h4>'+p.intro+'</div>' : '');
+  p.items.forEach(it=> sec.appendChild(renderItem(it, p)));
+  main.appendChild(sec);
+  const a=document.createElement('a'); a.href='#part'+(pi+1); a.textContent=(pi+1)+'. '+p.short; nav.appendChild(a);
+});
+const summary = document.createElement('div'); summary.className='summary'; summary.id='summary'; main.appendChild(summary);
+
+function renderItem(it, p){
+  const c = document.createElement('div'); c.className='card'; c.id='item-'+it._id; c.dataset.id = it._id;
+  const typName = {mc:'객관식', multi:'복수 선택', num:'계산', fill:'코드 빈칸', predict:'실행 결과 예측', calc:'계산기', note:'개념 확인', lab:'실습 예제'}[it.type]||it.type;
+  let h = '<div class="head"><span class="num">'+ (it.type==='calc'?'도구': it.type==='lab'?'LAB '+(it.lab||'') : '문제 '+(it._ii+1)) +'</span><span class="typ">'+typName+'</span>'+(it.points>1&&it.type!=='calc'?'<span class="typ">'+it.points+'점</span>':'')+'<h3>'+esc(it.title||'')+'</h3></div>';
+  h += '<div class="q">'+ (it.q? md(it.q):'') + (it.table? tableHtml(it.table):'') + (it.code ? '<pre><code>'+ (it.type==='fill'? fillHtml(it.code) : codeHtml(it.code)) +'</code></pre>' : '') + (it.after? md(it.after):'') + '</div>';
+  if(it.type==='mc' || it.type==='predict' || it.type==='multi'){
+    const multi = it.type==='multi';
+    h += '<div class="choices">' + it.choices.map((ch,i)=> '<label><input type="'+(multi?'checkbox':'radio')+'" name="'+it._id+'" value="'+i+'"><span class="k">'+String.fromCharCode(65+i)+'</span><span>'+md(ch)+'</span></label>').join('') + '</div>';
+  } else if(it.type==='num'){
+    h += '<div class="numrow"><input type="text" class="ans" placeholder="'+esc(it.placeholder||'숫자 입력 (예: 203530, 0.417, 784*256)')+'"><span class="unit">'+esc(it.unit||'')+'</span></div>';
+  } else if(it.type==='calc'){
+    h += calcHtml(it);
+  } else if(it.type==='lab'){
+    h += (it.prompt? '<div class="labout"><div class="lbl">프롬프트 (AI에 넣는 글)</div><pre class="prompt">'+esc(it.prompt)+'</pre></div>':'') + '<div class="labout"><div class="lbl">'+esc(it.outlabel||'실행 결과')+'</div>' + (it.output? '<pre class="out">'+esc(it.output)+'</pre>':'') + (it.image? '<img src="'+it.image+'" alt="결과 그림">':'') + '</div>' + (it.tasks? '<div class="tasks"><div class="lbl">해 보기</div><ol>'+it.tasks.map(t=>'<li>'+md(t)+'</li>').join('')+'</ol></div>':'') + (it.explain? '<div class="explain show"><h5>읽는 법</h5>'+md(it.explain)+'</div>':'');
+  }
+  if(it.type!=='calc' && it.type!=='note' && it.type!=='lab'){
+    h += '<div class="actions"><button class="btn primary chk">채점</button>'+(it.hint?'<button class="btn hnt">힌트</button>':'')+'<button class="btn rev">정답 보기</button><span class="kbd">Enter = 채점</span></div>';
+    h += '<div class="fb"></div>';
+    if(it.hint) h += '<div class="hint"><h5>💡 힌트</h5>'+md(it.hint)+'</div>';
+    h += '<div class="explain"><h5>✅ 해설</h5>'+ (it.explain? md(it.explain):'') + (it.explain_code? '<pre><code>'+codeHtml(it.explain_code)+'</code></pre>':'') +'</div>';
+  } else if(it.type==='note'){
+    h += '<div class="explain show"><h5>정리</h5>'+md(it.explain||'')+'</div>';
+  }
+  if(it.type==='lab'){ c.classList.add('lab'); }
+  c.innerHTML = h;
+  wire(c, it);
+  return c;
+}
+function tableHtml(t){ return '<div style="overflow-x:auto"><table><tr>'+t[0].map(x=>'<th>'+md(x)+'</th>').join('')+'</tr>'+t.slice(1).map(r=>'<tr>'+r.map(x=>'<td>'+md(x)+'</td>').join('')+'</tr>').join('')+'</table></div>'; }
+function fillHtml(code){ let i=0; return esc(code).replace(/___(\d+)___/g,(m,n)=>'<input class="blank" data-i="'+n+'" autocomplete="off" spellcheck="false" placeholder="빈칸 '+n+'">').replace(/(#[^\n<]*)/g,'<span class="cm">$1</span>'); }
+
+// ---------- grading ----------
+function grade(it, c){
+  let ok=false, detail='';
+  if(it.type==='mc'||it.type==='predict'){
+    const sel = c.querySelector('input:checked'); if(!sel){ return {none:true}; }
+    ok = (+sel.value===it.answer);
+    c.querySelectorAll('.choices label').forEach((l,i)=>{ l.classList.remove('right','wrong'); if(i===it.answer) l.classList.add('right'); else if(i===+sel.value) l.classList.add('wrong'); });
+  } else if(it.type==='multi'){
+    const sel = [...c.querySelectorAll('input:checked')].map(x=>+x.value); if(!sel.length) return {none:true};
+    const ans = it.answer.slice().sort().join(','); ok = sel.slice().sort().join(',')===ans;
+    c.querySelectorAll('.choices label').forEach((l,i)=>{ l.classList.remove('right','wrong'); if(it.answer.includes(i)) l.classList.add('right'); else if(sel.includes(i)) l.classList.add('wrong'); });
+  } else if(it.type==='num'){
+    const inp = c.querySelector('input.ans'); const v = parseNum(inp.value); if(inp.value.trim()==='') return {none:true};
+    if(isNaN(v)){ detail='숫자로 해석할 수 없습니다.'; ok=false; }
+    else {
+      const answers = Array.isArray(it.answer)? it.answer : [it.answer];
+      ok = answers.some(a=> { const tol = it.tol!=null ? it.tol : Math.abs(a)*(it.tolp!=null?it.tolp:0.01); return Math.abs(v-a) <= tol + 1e-12; });
+      detail = ok? '' : '입력값 '+v+' — 정답과 다릅니다.';
+    }
+    inp.classList.toggle('ok',ok); inp.classList.toggle('bad',!ok);
+  } else if(it.type==='fill'){
+    const inputs = [...c.querySelectorAll('input.blank')]; if(inputs.every(i=>!i.value.trim())) return {none:true};
+    let all=true; const wrong=[];
+    inputs.forEach(inp=>{ const n=+inp.dataset.i; const acc=(it.blanks[n-1]||[]).map(normCode); const v=normCode(inp.value); const good = acc.includes(v); inp.classList.toggle('ok',good); inp.classList.toggle('bad',!good); if(!good){ all=false; wrong.push(n);} });
+    ok=all; detail = ok?'':'틀린 빈칸: '+wrong.join(', ');
+  }
+  return {ok, detail};
+}
+function wire(c, it){
+  if(it.type==='calc'){ wireCalc(c,it); return; }
+  if(it.type==='note'||it.type==='lab') return;
+  const fb=$('.fb',c), ex=$('.explain',c), hn=$('.hint',c);
+  const chk=$('.chk',c), rev=$('.rev',c), hb=$('.hnt',c);
+  c.querySelectorAll('.choices label').forEach(l=> l.addEventListener('click',()=>{ setTimeout(()=>{ c.querySelectorAll('.choices label').forEach(x=>x.classList.toggle('sel', x.querySelector('input').checked)); },0); }));
+  c.addEventListener('keydown', e=>{ if(e.key==='Enter' && e.target.tagName==='INPUT' && e.target.type!=='radio'){ e.preventDefault(); chk.click(); } });
+  chk.addEventListener('click', ()=>{
+    const r = grade(it,c);
+    if(r.none){ fb.className='fb show bad'; fb.textContent='답을 입력(선택)한 뒤 채점하세요.'; return; }
+    fb.className='fb show '+(r.ok?'ok':'bad'); fb.innerHTML = r.ok ? '정답입니다! '+(it.points>1?'(+'+it.points+'점)':'') : '아쉽네요. '+(r.detail||'')+(it.hint?' 힌트를 열어 보세요.':'');
+    c.classList.remove('ok','bad'); c.classList.add(r.ok?'ok':'bad');
+    if(r.ok) ex.classList.add('show');
+    const prev = state[it._id]||{}; const tries=(prev.tries||0)+1;
+    state[it._id] = {done:true, ok: r.ok || !!prev.ok, tries, firstOk: prev.firstOk!=null? prev.firstOk : (r.ok && tries===1)};
+    save(); refresh();
+  });
+  rev.addEventListener('click', ()=>{ reveal(it,c); ex.classList.add('show'); if(!state[it._id]||!state[it._id].done){ state[it._id]={done:true, ok:false, tries:(state[it._id]||{}).tries||0, revealed:true}; save(); refresh(); } });
+  if(hb) hb.addEventListener('click', ()=> hn.classList.toggle('show'));
+  // restore
+  const st = state[it._id]; if(st && st.done){ c.classList.add(st.ok?'ok':'bad'); if(st.ok||st.revealed){ ex.classList.add('show'); } }
+}
+function reveal(it,c){
+  if(it.type==='mc'||it.type==='predict'){ c.querySelectorAll('.choices label').forEach((l,i)=>{ l.classList.toggle('right', i===it.answer); }); }
+  else if(it.type==='multi'){ c.querySelectorAll('.choices label').forEach((l,i)=>{ l.classList.toggle('right', it.answer.includes(i)); }); }
+  else if(it.type==='num'){ const inp=c.querySelector('input.ans'); inp.value = Array.isArray(it.answer)? it.answer[0] : it.answer; inp.classList.add('ok'); inp.classList.remove('bad'); }
+  else if(it.type==='fill'){ c.querySelectorAll('input.blank').forEach(inp=>{ inp.value = it.blanks[+inp.dataset.i-1][0]; inp.classList.add('ok'); inp.classList.remove('bad'); }); }
+  const fb=$('.fb',c); fb.className='fb show ok'; fb.textContent='정답을 표시했습니다. (점수에는 반영되지 않음)';
+}
+function refresh(){
+  let done=0,right=0,score=0; graded.forEach(it=>{ const s=state[it._id]; if(s&&s.done){ done++; if(s.ok){ right++; score+=it.points; } } });
+  $('#s-done').textContent=done; $('#s-right').textContent=right; $('#s-score').textContent=score;
+  $('#progbar').style.width = (graded.length? 100*done/graded.length:0)+'%';
+  // summary
+  let h='<h2>결과 요약</h2><div class="bar">';
+  D.parts.forEach((p,pi)=>{ const its=p.items.filter(x=>x.type!=='calc'&&x.type!=='note'&&x.type!=='lab'); if(!its.length) return; let d=0,r=0; its.forEach(it=>{ const s=state[it._id]; if(s&&s.done){d++; if(s.ok) r++;} }); h+='<div>'+esc(p.name)+' — '+r+'/'+its.length+' 정답'+(d<its.length?' (미완료 '+(its.length-d)+')':'')+'<div class="pb"><i style="width:'+(100*r/its.length)+'%;background:'+p.color+'"></i></div></div><div><b>'+Math.round(100*r/its.length)+'%</b></div>'; });
+  h+='</div>';
+  const pct = graded.length? Math.round(100*right/graded.length):0;
+  h+='<p style="margin-top:12px">'+ (done<graded.length ? '아직 '+(graded.length-done)+'문제가 남았습니다.' : (pct>=90?'훌륭합니다 — 이 장의 핵심을 확실히 잡았습니다.': pct>=70?'좋습니다. 틀린 문제의 해설을 다시 읽고 슬라이드의 해당 파트를 복습하세요.':'해설과 힌트를 참고해 다시 풀어 보세요. 슬라이드 정리 파트의 요약표가 도움이 됩니다.')) +'</p>';
+  h+='<div class="actions"><button class="btn" onclick="window.print()">결과 인쇄 / PDF 저장</button></div>';
+  summary.innerHTML=h;
+}
+$('#btn-reset').addEventListener('click',()=>{ if(confirm('이 장의 풀이 기록을 모두 지울까요?')){ state={}; save(); location.reload(); } });
+
+// ---------- calculators ----------
+function calcHtml(it){
+  const w=it.widget;
+  if(w==='softmax') return '<div class="calc"><div class="row">로짓 z (쉼표 구분) <input id="'+it._id+'-z" value="'+esc(it.init||'2.0, 1.0, 0.1')+'"> 정답 클래스 <input id="'+it._id+'-y" value="'+(it.inity!=null?it.inity:0)+'" style="width:70px"><button class="btn run">계산</button></div><div class="out"></div></div>';
+  if(w==='params') return '<div class="calc"><div class="row">층 구성 (입력 → 유닛 …, 쉼표) <input id="'+it._id+'-l" value="'+esc(it.init||'784, 256, 10')+'" style="width:220px"> <label><input type="checkbox" id="'+it._id+'-bn"> 은닉층마다 BatchNorm</label><button class="btn run">계산</button></div><div class="out"></div></div>';
+  if(w==='conv') return '<div class="calc"><div class="row">입력 <input id="'+it._id+'-i" value="28" style="width:70px"> 커널 <input id="'+it._id+'-k" value="3" style="width:70px"> 스트라이드 <input id="'+it._id+'-s" value="1" style="width:70px"> 패딩 <select id="'+it._id+'-p"><option value="valid">valid</option><option value="same">same</option></select> 입력채널 <input id="'+it._id+'-ci" value="1" style="width:70px"> 필터수 <input id="'+it._id+'-co" value="32" style="width:70px"><button class="btn run">계산</button></div><div class="out"></div></div>';
+  if(w==='steps') return '<div class="calc"><div class="row">학습 샘플 수 <input id="'+it._id+'-n" value="55000"> batch_size <input id="'+it._id+'-b" value="128" style="width:90px"> epochs <input id="'+it._id+'-e" value="20" style="width:90px"><button class="btn run">계산</button></div><div class="out"></div></div>';
+  if(w==='deriv') return '<div class="calc"><div class="row">층 수 L <input id="'+it._id+'-L" value="10" style="width:80px"> 층당 도함수 크기 (예: sigmoid 0.25, tanh 0.6, ReLU 1) <input id="'+it._id+'-g" value="0.25" style="width:90px"> 가중치 스케일 ‖W‖ <input id="'+it._id+'-w" value="1.0" style="width:90px"><button class="btn run">계산</button></div><div class="out"></div></div>';
+  if(w==='rnnparams') return '<div class="calc"><div class="row">입력 차원 D <input id="'+it._id+'-d" value="128" style="width:90px"> 유닛 U <input id="'+it._id+'-u" value="128" style="width:90px"><button class="btn run">계산</button></div><div class="out"></div></div>';
+  if(w==='attention') return '<div class="calc"><div class="row">스코어 e (쉼표) <input id="'+it._id+'-e" value="'+esc(it.init||'2.0, 0.5, -1.0')+'"> √d_k 로 나누기 d_k= <input id="'+it._id+'-d" value="1" style="width:70px"><button class="btn run">계산</button></div><div class="out"></div></div>';
+  if(w==='ngram') return '<div class="calc"><div class="row">문장 <input id="'+it._id+'-s" value="'+esc(it.init||'An adorable little boy is spreading smiles')+'" style="width:360px"> n <input id="'+it._id+'-n" value="2" style="width:60px"><button class="btn run">계산</button></div><div class="out"></div></div>';
+  if(w==='cosine') return '<div class="calc"><div class="row">벡터 A <input id="'+it._id+'-a" value="'+esc(it.inita||'1, 2, 0')+'"> 벡터 B <input id="'+it._id+'-b" value="'+esc(it.initb||'2, 4, 1')+'"><button class="btn run">계산</button></div><div class="out"></div></div>';
+  if(w==='sigmoid') return '<div class="calc"><div class="row">입력 x (쉼표) <input id="'+it._id+'-x" value="'+esc(it.init||'2, 3')+'"> 가중치 w <input id="'+it._id+'-w" value="'+esc(it.initw||'0.5, -0.2')+'"> 편향 b <input id="'+it._id+'-b" value="1" style="width:70px"> 활성화 <select id="'+it._id+'-f"><option>sigmoid</option><option>tanh</option><option>relu</option></select><button class="btn run">계산</button></div><div class="out"></div></div>';
+  if(w==='confusion') return '<div class="calc"><div class="row">TP <input id="'+it._id+'-tp" value="90" style="width:70px"> FP <input id="'+it._id+'-fp" value="10" style="width:70px"> FN <input id="'+it._id+'-fn" value="30" style="width:70px"> TN <input id="'+it._id+'-tn" value="870" style="width:70px"><button class="btn run">계산</button></div><div class="out"></div></div>';
+  if(w==='prompt'){ const F=[['role','① 역할','너는 Streamlit 앱을 만드는 파이썬 개발자다.'],['goal','② 목표','CSV를 올리면 숫자 열 요약표와 히스토그램을 보여 주는 앱'],['ctx','③ 맥락','Python 3.11, streamlit 최신, 데이터는 telco_churn.csv (7,043행 21열, TotalCharges는 문자열)'],['cons','④ 제약','파일 하나, pandas·streamlit만, 열 이름 하드코딩 금지'],['fmt','⑤ 출력 형식','전체 코드를 코드 블록 하나로, 바뀐 줄에 주석'],['ex','⑥ 예시','tenure 선택 → 20구간 막대 + 평균·결측 캡션']]; return '<div class="calc"><div class="pb">'+F.map(f=>'<label for="'+it._id+'-'+f[0]+'">'+f[1]+'</label><textarea id="'+it._id+'-'+f[0]+'" rows="1" placeholder="'+esc(f[2])+'"></textarea>').join('')+'</div><div class="row"><button class="btn run">프롬프트 조립</button><button class="btn cp">복사</button><span class="kbd">비어 있는 요소는 AI가 "추측"으로 채운다는 뜻입니다</span></div><div class="out"></div></div>'; }
+  return '<div class="calc">알 수 없는 도구</div>';
+}
+const nums = s => String(s).split(/[,\s]+/).filter(x=>x!=='').map(Number);
+function wireCalc(c,it){
+  const out=$('.out',c), id=it._id;
+  const run=()=>{ try{ out.textContent = CALC[it.widget](id); }catch(e){ out.textContent='입력을 확인하세요: '+e.message; } };
+  $('.run',c).addEventListener('click',run); c.addEventListener('keydown',e=>{ if(e.key==='Enter' && e.target.tagName!=='TEXTAREA'){ e.preventDefault(); run(); } }); setTimeout(run,0);
+  const cp=$('.cp',c); if(cp) cp.addEventListener('click',()=>{ const t=out.textContent.split('\n--- 점검 ---')[0]; try{ navigator.clipboard.writeText(t); cp.textContent='복사됨'; setTimeout(()=>cp.textContent='복사',1500);}catch(e){} });
+}
+const g = id => document.getElementById(id);
+const CALC = {
+  softmax(id){ const z=nums(g(id+'-z').value), y=+g(id+'-y').value; const m=Math.max(...z); const ez=z.map(v=>Math.exp(v-m)); const S=ez.reduce((a,b)=>a+b,0); const p=ez.map(v=>v/S); const ex=z.map(v=>Math.exp(v)); let s='exp(z)   = ['+ex.map(v=>v.toFixed(3)).join(', ')+']  합 = '+ex.reduce((a,b)=>a+b,0).toFixed(3)+'\nsoftmax  = ['+p.map(v=>v.toFixed(3)).join(', ')+']  (합 = 1)\n'; if(y>=0&&y<p.length) s+='정답 클래스 '+y+'의 확률 p = '+p[y].toFixed(4)+'\ncross-entropy 손실 = −log(p) = '+(-Math.log(p[y])).toFixed(4)+'\n∂L/∂z = p − y = ['+p.map((v,i)=>(v-(i===y?1:0)).toFixed(3)).join(', ')+']'; return s; },
+  params(id){ const L=nums(g(id+'-l').value), bn=g(id+'-bn').checked; let tot=0, s=''; for(let i=1;i<L.length;i++){ const n=L[i-1]*L[i]+L[i]; tot+=n; s+='Dense('+L[i-1]+' → '+L[i]+'): '+L[i-1]+'×'+L[i]+' + '+L[i]+' = '+n.toLocaleString()+'\n'; if(bn && i<L.length-1){ tot+=4*L[i]; s+='BatchNorm('+L[i]+'): 4×'+L[i]+' = '+(4*L[i]).toLocaleString()+'\n'; } } return s+'합계 = '+tot.toLocaleString()+' 개  (float32 ≈ '+(tot*4/1024/1024).toFixed(2)+' MB)'; },
+  conv(id){ const I=+g(id+'-i').value,K=+g(id+'-k').value,S=+g(id+'-s').value,P=g(id+'-p').value,Ci=+g(id+'-ci').value,Co=+g(id+'-co').value; const pad = P==='same'? Math.floor((K-1)/2):0; const O=Math.floor((I-K+2*pad)/S)+1; const params=K*K*Ci*Co+Co; return '출력 크기 = floor(('+I+' − '+K+' + 2×'+pad+') / '+S+') + 1 = '+O+'  →  ('+O+', '+O+', '+Co+')\nConv2D 파라미터 = '+K+'×'+K+'×'+Ci+'×'+Co+' + '+Co+' = '+params.toLocaleString()+'\nMaxPool(2,2) 후 = ('+Math.floor(O/2)+', '+Math.floor(O/2)+', '+Co+')  → Flatten = '+(Math.floor(O/2)**2*Co).toLocaleString(); },
+  steps(id){ const n=+g(id+'-n').value,b=+g(id+'-b').value,e=+g(id+'-e').value; const st=Math.ceil(n/b); return 'step/epoch = ⌈'+n+' / '+b+'⌉ = '+st+'\n마지막 배치 크기 = '+(n-(st-1)*b)+'\n총 가중치 갱신 횟수 = '+st+' × '+e+' = '+(st*e).toLocaleString(); },
+  deriv(id){ const L=+g(id+'-L').value,gg=+g(id+'-g').value,w=+g(id+'-w').value; const f=Math.pow(gg*w,L); return '층당 곱 인자 = f′ × ‖W‖ = '+gg+' × '+w+' = '+(gg*w).toFixed(4)+'\n'+L+'층 통과 후 기울기 배율 = ('+(gg*w).toFixed(4)+')^'+L+' = '+f.toExponential(3)+'\n'+(f<1e-3?'→ 기울기 소실 (앞단 거의 학습 안 됨)': f>1e3?'→ 기울기 폭주 (NaN 위험)':'→ 건강한 범위'); },
+  rnnparams(id){ const d=+g(id+'-d').value,u=+g(id+'-u').value; const s=(d+u+1)*u; return 'SimpleRNN: (D+U+1)×U = ('+d+'+'+u+'+1)×'+u+' = '+s.toLocaleString()+'\nGRU     : 3×(D+U+1)×U = '+(3*s).toLocaleString()+'  (Keras reset_after=True 는 3×(D+U+2)×U = '+(3*(d+u+2)*u).toLocaleString()+')\nLSTM    : 4×(D+U+1)×U = '+(4*s).toLocaleString(); },
+  attention(id){ const e=nums(g(id+'-e').value), d=+g(id+'-d').value; const sc=e.map(v=>v/Math.sqrt(d)); const m=Math.max(...sc); const ex=sc.map(v=>Math.exp(v-m)); const S=ex.reduce((a,b)=>a+b,0); const a=ex.map(v=>v/S); return '스케일된 스코어 = ['+sc.map(v=>v.toFixed(3)).join(', ')+']\n어텐션 분포 α = softmax = ['+a.map(v=>v.toFixed(3)).join(', ')+']  (합 = 1)\n가장 집중하는 위치 = '+a.indexOf(Math.max(...a))+'  (컨텍스트 c = Σ αᵢ hᵢ)'; },
+  ngram(id){ const w=g(id+'-s').value.trim().split(/\s+/), n=+g(id+'-n').value; const gs=[]; for(let i=0;i+n<=w.length;i++) gs.push(w.slice(i,i+n).join(' ')); return n+'-gram '+gs.length+'개:\n'+gs.map(x=>'('+x+')').join('\n'); },
+  cosine(id){ const a=nums(g(id+'-a').value), b=nums(g(id+'-b').value); if(a.length!==b.length) throw new Error('길이가 다릅니다'); const dot=a.reduce((s,v,i)=>s+v*b[i],0); const na=Math.sqrt(a.reduce((s,v)=>s+v*v,0)), nb=Math.sqrt(b.reduce((s,v)=>s+v*v,0)); return 'A·B = '+dot.toFixed(4)+'\n‖A‖ = '+na.toFixed(4)+', ‖B‖ = '+nb.toFixed(4)+'\ncos = '+(dot/(na*nb)).toFixed(4); },
+  sigmoid(id){ const x=nums(g(id+'-x').value), w=nums(g(id+'-w').value), b=+g(id+'-b').value, f=g(id+'-f').value; if(x.length!==w.length) throw new Error('x와 w 길이가 다릅니다'); const z=x.reduce((s,v,i)=>s+v*w[i],0)+b; const a= f==='sigmoid'? 1/(1+Math.exp(-z)) : f==='tanh'? Math.tanh(z) : Math.max(0,z); const d = f==='sigmoid'? a*(1-a) : f==='tanh'? 1-a*a : (z>0?1:0); return 'z = w·x + b = '+x.map((v,i)=>'('+w[i]+'×'+v+')').join(' + ')+' + '+b+' = '+z.toFixed(4)+'\na = '+f+'(z) = '+a.toFixed(4)+'\n'+f+'′(z) = '+d.toFixed(4); },
+  prompt(id){ const v=k=>document.getElementById(id+'-'+k).value.trim(); const F=[['role','',''],['goal','[목표] ',''],['ctx','[맥락] ',''],['cons','[제약] ',''],['fmt','[출력 형식] ',''],['ex','[예시] ','']]; const names={role:'① 역할',goal:'② 목표',ctx:'③ 맥락',cons:'④ 제약',fmt:'⑤ 출력 형식',ex:'⑥ 예시'}; const miss=[]; const lines=[]; F.forEach(f=>{ const t=v(f[0]); const el=document.getElementById(id+'-'+f[0]); el.classList.toggle('miss',!t); if(t) lines.push(f[1]+t); else miss.push(names[f[0]]); }); let s=lines.join('\n'); if(!lines.length){ F.forEach(f=> document.getElementById(id+'-'+f[0]).classList.remove('miss')); return '여섯 칸 중 하나라도 채운 뒤 "프롬프트 조립"을 누르세요.'; } s+='\n\n--- 점검 ---\n채운 요소 '+lines.length+'/6'; if(miss.length) s+='\n빠진 요소: '+miss.join(', ')+'  → AI가 추측으로 채운다. 특히 ③ 맥락이 없으면 없는 열 이름(예: "총요금")을 지어낼 수 있다.'; else s+='\n6요소가 모두 있습니다. 이제 한 프롬프트에 한 기능만 담겼는지 확인하세요.'; return s; },
+  confusion(id){ const tp=+g(id+'-tp').value,fp=+g(id+'-fp').value,fn=+g(id+'-fn').value,tn=+g(id+'-tn').value; const P=tp/(tp+fp), R=tp/(tp+fn), F=2*P*R/(P+R), A=(tp+tn)/(tp+fp+fn+tn); return 'Accuracy  = (TP+TN)/전체 = '+A.toFixed(4)+'\nPrecision = TP/(TP+FP) = '+P.toFixed(4)+'\nRecall    = TP/(TP+FN) = '+R.toFixed(4)+'\nF1        = 2PR/(P+R) = '+F.toFixed(4); },
+};
+refresh();
+// ---------- self-test (?selftest=1): fill correct answers, grade, report in <title> ----------
+if(/selftest=1/.test(location.search)){
+  let okc=0; graded.forEach(it=>{ const c=document.getElementById('item-'+it._id);
+    if(it.type==='mc'||it.type==='predict'){ c.querySelectorAll('input')[it.answer].checked=true; }
+    else if(it.type==='multi'){ it.answer.forEach(a=> c.querySelectorAll('input')[a].checked=true); }
+    else if(it.type==='num'){ c.querySelector('input.ans').value = Array.isArray(it.answer)? it.answer[0]: it.answer; }
+    else if(it.type==='fill'){ c.querySelectorAll('input.blank').forEach(inp=> inp.value = it.blanks[+inp.dataset.i-1][0]); }
+    $('.chk',c).click(); if(c.classList.contains('ok')) okc++; else console.log('SELFTEST FAIL', it._id); });
+  document.title = 'SELFTEST '+okc+'/'+graded.length;
+}
+})();
+</script>
+</body>
+</html>
